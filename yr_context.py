@@ -1,6 +1,9 @@
 # Libraries needed (pandas is not standard and must be installed in Python)
 import requests
 import datetime
+import seaborn
+import matplotlib.pyplot as plt
+
 
 # Insert your own client ID here
 # Initially hard-coded, removed to publish, replaced with external input in later commit
@@ -31,7 +34,7 @@ for years_ago in range(10, -1, -1):
 
     try:
         data = json['data']
-        air_temp_dict = {'year': today.year, 'min': False, 'mean': False, 'max': False }
+        air_temp_dict = {'year': get_date.year, 'min': False, 'mean': False, 'max': False }
         for observation in data[0]['observations']:
             if observation['elementId'].startswith('min'):
                 air_temp_dict['min'] = observation['value']
@@ -46,3 +49,21 @@ for years_ago in range(10, -1, -1):
         print("ERROR")
 
 print(history_list)
+
+# reformat data for day graph
+mean = list(())
+min = list(())
+max = list(())
+year = list(())
+for year_data in history_list:
+    mean.append(year_data['mean'])
+    min.append(year_data['min'])
+    max.append(year_data['max'])
+    year.append(year_data['year'])
+print(year)
+seaborn.set_theme(style="dark")
+seaborn.set()
+day_graph = plt.plot(year, mean, 'go')
+day_graph = plt.plot(year, min, 'bo')
+day_graph = plt.plot(year, max, 'ro')
+plt.show()
