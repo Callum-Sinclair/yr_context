@@ -70,7 +70,10 @@ for year_data in history_list:
 
 seaborn.set_theme(style="dark")
 seaborn.set()
-day_graph = plt.plot(mean_year, mean, 'go')
-day_graph = plt.plot(min_year, min, 'bo')
-day_graph = plt.plot(max_year, max, 'ro')
+plt.plot(mean_year, mean, 'go')
+plt.plot(min_year, min, 'bo')
+plt.plot(max_year, max, 'ro')
+plt.axhline(y=0, color='b', linestyle='-')
+plt.title('Temperature in Trondheim on {}/{} by Year'.format(today.month, today.day))
+plt.plot()
 plt.show()
