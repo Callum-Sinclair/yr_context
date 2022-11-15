@@ -3,7 +3,7 @@ import requests
 import datetime
 import seaborn
 import matplotlib.pyplot as plt
-
+import argparse
 
 # Insert your own client ID here
 # Initially hard-coded, removed to publish, replaced with external input in later commit
@@ -12,10 +12,27 @@ client_id = '<REDACTED>'
 # Source
 trondheim = 'SN68125'
 
-today = datetime.date.today()
+parser = argparse.ArgumentParser(description="Weather data for Trondheim",
+                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument("-d", "--day", default=0, help="day of month")
+parser.add_argument("-m", "--month", default=0, help="number of month")
+
+args = parser.parse_args()
+config = vars(args)
+
+requested_day = datetime.date.today().day
+requested_month = datetime.date.today().month
+if config['day']:
+    requested_day = int(config['day'])
+if config['month']:
+    requested_month = int(config['month'])
+
+requested_date = datetime.date(datetime.date.today().year, requested_month, requested_day)
+print(requested_date)
+
 history_list = list(())
 for years_ago in range(10, -1, -1):
-    get_date = datetime.date(today.year - years_ago, today.month, today.day)
+    get_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day)
     print(get_date)
 
     # Define endpoint and parameters
@@ -74,6 +91,6 @@ plt.plot(mean_year, mean, 'go')
 plt.plot(min_year, min, 'bo')
 plt.plot(max_year, max, 'ro')
 plt.axhline(y=0, color='b', linestyle='-')
-plt.title('Temperature in Trondheim on {}/{} by Year'.format(today.month, today.day))
+plt.title('Temperature in Trondheim on {}/{} by Year'.format(requested_date.day, requested_date.month))
 plt.plot()
 plt.show()
