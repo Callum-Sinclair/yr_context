@@ -52,18 +52,25 @@ print(history_list)
 
 # reformat data for day graph
 mean = list(())
+mean_year = list(())
 min = list(())
+min_year = list(())
 max = list(())
-year = list(())
+max_year = list(())
 for year_data in history_list:
-    mean.append(year_data['mean'])
-    min.append(year_data['min'])
-    max.append(year_data['max'])
-    year.append(year_data['year'])
-print(year)
+    if year_data['mean']:
+        mean.append(year_data['mean'])
+        mean_year.append(year_data['year'])
+    if year_data['min']:
+        min.append(year_data['min'])
+        min_year.append(year_data['year'])
+    if year_data['max']:
+        max.append(year_data['max'])
+        max_year.append(year_data['year'])
+
 seaborn.set_theme(style="dark")
 seaborn.set()
-day_graph = plt.plot(year, mean, 'go')
-day_graph = plt.plot(year, min, 'bo')
-day_graph = plt.plot(year, max, 'ro')
+day_graph = plt.plot(mean_year, mean, 'go')
+day_graph = plt.plot(min_year, min, 'bo')
+day_graph = plt.plot(max_year, max, 'ro')
 plt.show()
