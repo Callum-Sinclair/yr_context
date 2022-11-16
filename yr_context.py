@@ -6,7 +6,10 @@ import matplotlib.pyplot as plt
 import argparse
 
 # Source
-trondheim = 'SN68125'
+sources = {
+'trondheim': 'SN68125',
+'høvringen': 'SN16271',
+}
 
 with open('client_id.txt') as f:
     client_id = f.readline().strip()
@@ -15,9 +18,21 @@ parser = argparse.ArgumentParser(description="Weather data for Trondheim",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-d", "--day", default=0, help="day of month")
 parser.add_argument("-m", "--month", default=0, help="number of month")
+parser.add_argument("-l", "--location", default='Trondheim', help="Location for temparatures, from known list")
+parser.add_argument("-i", "--location_id", default=0, help="Weather station ID to use, cannot be combined with --location")
 
 args = parser.parse_args()
 config = vars(args)
+
+if config['location_id'] != 0:
+    location = config['location_id']
+    location_name = config['location_id']
+else:
+    location = sources[config['location'].lower()]
+    location_name = config['location']
+
+print(location_name)
+print(location)
 
 requested_day = datetime.date.today().day
 requested_month = datetime.date.today().month
@@ -29,6 +44,7 @@ if config['month']:
 requested_date = datetime.date(datetime.date.today().year, requested_month, requested_day)
 print(requested_date)
 
+print('Fetching data for...')
 history_list = list(())
 for years_ago in range(10, -1, -1):
     get_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day)
@@ -37,7 +53,7 @@ for years_ago in range(10, -1, -1):
     # Define endpoint and parameters
     endpoint = 'https://frost.met.no/observations/v0.jsonld'
     parameters = {
-        'sources': trondheim,
+        'sources': location,
         'elements': 'max(air_temperature P1D),min(air_temperature P1D),mean(air_temperature P1D)',
         'referencetime': get_date,
         'timeoffsets': 'default',
@@ -90,6 +106,6 @@ plt.plot(mean_year, mean, 'go')
 plt.plot(min_year, min, 'bo')
 plt.plot(max_year, max, 'ro')
 plt.axhline(y=0, color='b', linestyle='-')
-plt.title('Temperature in Trondheim on {}/{} by Year'.format(requested_date.day, requested_date.month))
+plt.title('Temperature in {} on {}/{} by Year'.format(location_name, requested_date.day, requested_date.month))
 plt.plot()
 plt.show()
