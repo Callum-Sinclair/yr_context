@@ -5,12 +5,11 @@ import seaborn
 import matplotlib.pyplot as plt
 import argparse
 
-# Insert your own client ID here
-# Initially hard-coded, removed to publish, replaced with external input in later commit
-client_id = '<REDACTED>'
-
 # Source
 trondheim = 'SN68125'
+
+with open('client_id.txt') as f:
+    client_id = f.readline().strip()
 
 parser = argparse.ArgumentParser(description="Weather data for Trondheim",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
