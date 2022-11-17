@@ -7,8 +7,13 @@ import argparse
 
 # Source
 sources = {
-'trondheim': 'SN68125',
-'høvringen': 'SN16271',
+    'trondheim': 'SN68125',
+    'høvringen': 'SN16271',
+    'røros': 'SN10380',
+    'oslo': 'SN18210',
+    'bergen': 'SN50540',
+    'tromsø': 'SN90450',
+    'oppdal': 'SN63705',
 }
 
 with open('client_id.txt') as f:
@@ -18,8 +23,8 @@ parser = argparse.ArgumentParser(description="Weather data for Trondheim",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("-d", "--day", default=0, help="day of month")
 parser.add_argument("-m", "--month", default=0, help="number of month")
-parser.add_argument("-l", "--location", default='Trondheim', help="Location for temparatures, from known list")
-parser.add_argument("-i", "--location_id", default=0, help="Weather station ID to use, cannot be combined with --location")
+parser.add_argument("-l", "--location", default='Trondheim', help="Location for temparatures, ignored if location_id given", choices=sources.keys())
+parser.add_argument("-i", "--location_id", default=0, help="Weather station ID to use, overrides --location")
 
 args = parser.parse_args()
 config = vars(args)
@@ -32,7 +37,7 @@ else:
     location_name = config['location']
 
 print(location_name)
-print(location)
+print('Using weather station ID {}'.format(location))
 
 requested_day = datetime.date.today().day
 requested_month = datetime.date.today().month
