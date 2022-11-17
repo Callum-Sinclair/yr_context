@@ -115,9 +115,9 @@ for days_back in range(0, int(config['num_days'])):
             max.append(year_data['max'])
             max_year.append(year_data['year'])
 
-    plt.plot(mean_year, mean, 'go')
-    plt.plot(min_year, min, 'bo')
-    plt.plot(max_year, max, 'ro')
+    mean_plot, = plt.plot(mean_year, mean, 'go', label='Daily mean')
+    min_plot, = plt.plot(min_year, min, 'bo', label='Daily minimum')
+    max_plot, = plt.plot(max_year, max, 'ro', label='Daily maximum')
 
 
 plt.axhline(y=0, color='b', linestyle='-')
@@ -126,5 +126,9 @@ if int(config['num_days']) == 1:
 else:
     start_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day) - datetime.timedelta(days=int(config['num_days']))
     plt.title('Temperature in {} on {}/{} to {}/{} by Year'.format(location_name, start_date.day, start_date.month, requested_date.day, requested_date.month))
+
+
+plt.legend(handles=[max_plot, mean_plot, min_plot], bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=3)
+
 plt.plot()
 plt.show()
