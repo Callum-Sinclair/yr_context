@@ -46,7 +46,12 @@ if config['day']:
 if config['month']:
     requested_month = int(config['month'])
 
-requested_date = datetime.date(datetime.date.today().year, requested_month, requested_day)
+try:
+    requested_date = datetime.date(datetime.date.today().year, requested_month, requested_day)
+except ValueError:
+    print('Invalid date requested')
+    raise
+
 print(requested_date)
 
 print('Fetching data for...')
