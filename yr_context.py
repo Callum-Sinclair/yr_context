@@ -27,6 +27,7 @@ parser.add_argument("-l", "--location", default='Trondheim', help="Location for 
 parser.add_argument("-i", "--location_id", default=0, help="Weather station ID to use, overrides --location")
 parser.add_argument("-n", "--num_days", default=1, help="The number of days to fetch for each year (requested day and (n-1) days previous)")
 parser.add_argument("-a", "--average_only", action='store_true', help="Only display the average temperatures, not max and min")
+parser.add_argument("-q", "--quiet", action='store_true', help="Silence most print output")
 
 args = parser.parse_args()
 config = vars(args)
@@ -38,7 +39,7 @@ else:
     location = sources[config['location'].lower()]
     location_name = config['location']
 
-print(location_name)
+print('Location: {}'.format(location_name))
 print('Using weather station ID {}'.format(location))
 
 requested_day = datetime.date.today().day
@@ -57,14 +58,18 @@ except ValueError:
 seaborn.set_theme(style="dark")
 seaborn.set()
 
-print('Requesting data from {}'.format(requested_date))
-print('Fetching data for...')
+if not config['quiet']:
+    print('\nRequesting data from {}\n'.format(requested_date))
+    print('Fetching data for...')
 
 for days_back in range(0, int(config['num_days'])):
     history_list = list(())
     for years_ago in range(10, -1, -1):
-        get_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day) - datetime.timedelta(days=days_back)
-        print(get_date)
+        get_date = datetime.date(requested_date.year - years_ago,
+                                 requested_date.month,
+                                 requested_date.day) - datetime.timedelta(days=days_back)
+        if not config['quiet']:
+            print(get_date)
 
         # Define endpoint and parameters
         endpoint = 'https://frost.met.no/observations/v0.jsonld'
@@ -94,7 +99,7 @@ for days_back in range(0, int(config['num_days'])):
             # print(air_temp_dict)
 
         except KeyError:
-            print("ERROR")
+            print("No data recieved for {}".format(get_date))
 
     # print(history_list)
 
