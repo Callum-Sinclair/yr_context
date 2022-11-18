@@ -122,13 +122,15 @@ for days_back in range(0, int(config['num_days'])):
 
 plt.axhline(y=0, color='b', linestyle='-')
 if int(config['num_days']) == 1:
-    plt.title('Temperature in {} on {}/{} by Year'.format(location_name, requested_date.day, requested_date.month))
+    plt.title('Temperature in {} on {}/{} by Year'.format(location_name, requested_date.day, requested_date.month), size='large')
 else:
     start_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day) - datetime.timedelta(days=int(config['num_days']))
-    plt.title('Temperature in {} on {}/{} to {}/{} by Year'.format(location_name, start_date.day, start_date.month, requested_date.day, requested_date.month))
+    plt.title('Temperature in {} on {}/{} to {}/{} by Year'.format(location_name, start_date.day, start_date.month, requested_date.day, requested_date.month), size='large')
 
 
-plt.legend(handles=[max_plot, mean_plot, min_plot], bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=3)
+plt.subplots_adjust(bottom=0.2)
+plt.legend(handles=[max_plot, mean_plot, min_plot], bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=3)
+plt.ylabel("Recorded temperatures ('C)")
 
 plt.plot()
 plt.show()
