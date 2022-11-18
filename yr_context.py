@@ -26,6 +26,7 @@ parser.add_argument("-m", "--month", default=0, help="number of month")
 parser.add_argument("-l", "--location", default='Trondheim', help="Location for temparatures, ignored if location_id given", choices=sources.keys())
 parser.add_argument("-i", "--location_id", default=0, help="Weather station ID to use, overrides --location")
 parser.add_argument("-n", "--num_days", default=1, help="The number of days to fetch for each year (requested day and (n-1) days previous)")
+parser.add_argument("-a", "--average_only", action='store_true', help="Only display the average temperatures, not max and min")
 
 args = parser.parse_args()
 config = vars(args)
@@ -108,12 +109,13 @@ for days_back in range(0, int(config['num_days'])):
         if year_data['mean']:
             mean.append(year_data['mean'])
             mean_year.append(year_data['year'])
-        if year_data['min']:
-            min.append(year_data['min'])
-            min_year.append(year_data['year'])
-        if year_data['max']:
-            max.append(year_data['max'])
-            max_year.append(year_data['year'])
+        if not config['average_only']:
+            if year_data['min']:
+                min.append(year_data['min'])
+                min_year.append(year_data['year'])
+            if year_data['max']:
+                max.append(year_data['max'])
+                max_year.append(year_data['year'])
 
     mean_plot, = plt.plot(mean_year, mean, 'go', label='Daily mean')
     min_plot, = plt.plot(min_year, min, 'bo', label='Daily minimum')
@@ -122,9 +124,9 @@ for days_back in range(0, int(config['num_days'])):
 
 plt.axhline(y=0, color='b', linestyle='-')
 if int(config['num_days']) == 1:
-    plt.title('Temperature in {} on {}/{} by Year'.format(location_name, requested_date.day, requested_date.month), size='large')
+    plt.title('Temperature in {} on {}/{} by Year'.format(location_name, requested_date.day, requested_date.month), size='x-large')
 else:
-    start_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day) - datetime.timedelta(days=int(config['num_days']))
+    start_date = datetime.date(requested_date.year - years_ago, requested_date.month, requested_date.day) - datetime.timedelta(days=(int(config['num_days']) - 1))
     plt.title('Temperature in {} on {}/{} to {}/{} by Year'.format(location_name, start_date.day, start_date.month, requested_date.day, requested_date.month), size='large')
 
 
