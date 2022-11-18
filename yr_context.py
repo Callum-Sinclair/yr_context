@@ -1,11 +1,10 @@
-# Libraries needed (pandas is not standard and must be installed in Python)
 import requests
 import datetime
 import seaborn
 import matplotlib.pyplot as plt
 import argparse
 
-# Source
+# Sources available by name
 sources = {
     'trondheim': 'SN68125',
     'høvringen': 'SN16271',
@@ -15,9 +14,6 @@ sources = {
     'tromsø': 'SN90450',
     'oppdal': 'SN63705',
 }
-
-with open('client_id.txt') as f:
-    client_id = f.readline().strip()
 
 parser = argparse.ArgumentParser(description="Weather data for Trondheim",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -32,6 +28,7 @@ parser.add_argument("-q", "--quiet", action='store_true', help="Silence most pri
 args = parser.parse_args()
 config = vars(args)
 
+# Set location details
 if config['location_id'] != 0:
     location = config['location_id']
     location_name = config['location_id']
@@ -42,6 +39,7 @@ else:
 print('Location: {}'.format(location_name))
 print('Using weather station ID {}'.format(location))
 
+# Set start date
 requested_day = datetime.date.today().day
 requested_month = datetime.date.today().month
 if config['day']:
@@ -55,13 +53,19 @@ except ValueError:
     print('Invalid date requested')
     raise
 
-seaborn.set_theme(style="dark")
-seaborn.set()
-
 if not config['quiet']:
     print('\nRequesting data from {}\n'.format(requested_date))
     print('Fetching data for...')
 
+# Read client id from client_id file
+with open('client_id.txt') as f:
+    client_id = f.readline().strip()
+
+# Prepare graph
+seaborn.set_theme(style="dark")
+seaborn.set()
+
+# Gather and plot data
 for days_back in range(0, int(config['num_days'])):
     history_list = list(())
     for years_ago in range(10, -1, -1):
@@ -96,12 +100,9 @@ for days_back in range(0, int(config['num_days'])):
                 if observation['elementId'].startswith('max'):
                     air_temp_dict['max'] = observation['value']
             history_list.append(air_temp_dict)
-            # print(air_temp_dict)
 
         except KeyError:
             print("No data recieved for {}".format(get_date))
-
-    # print(history_list)
 
     # reformat data for day graph
     mean = list(())
@@ -122,6 +123,7 @@ for days_back in range(0, int(config['num_days'])):
                 max.append(year_data['max'])
                 max_year.append(year_data['year'])
 
+    # Plot data for this date
     mean_plot, = plt.plot(mean_year, mean, 'go', label='Daily mean')
     min_plot, = plt.plot(min_year, min, 'bo', label='Daily minimum')
     max_plot, = plt.plot(max_year, max, 'ro', label='Daily maximum')
