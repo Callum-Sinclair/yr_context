@@ -23,6 +23,7 @@ parser.add_argument("-l", "--location", default='Trondheim', help="Location for 
 parser.add_argument("-i", "--location_id", default=0, help="Weather station ID to use, overrides --location")
 parser.add_argument("-n", "--num_days", default=1, help="The number of days to fetch for each year (requested day and (n-1) days previous)")
 parser.add_argument("-a", "--average_only", action='store_true', help="Only display the average temperatures, not max and min")
+parser.add_argument("-w", "--wind", action='store_true', help="Get wind speed (max gust, daily average, minimum hourly average) instead of temperature")
 parser.add_argument("-q", "--quiet", action='store_true', help="Silence most print output")
 
 args = parser.parse_args()
@@ -77,9 +78,13 @@ for days_back in range(0, int(config['num_days'])):
 
         # Define endpoint and parameters
         endpoint = 'https://frost.met.no/observations/v0.jsonld'
+        if config['wind']:
+            elements = 'max(wind_speed_of_gust P1D),min(wind_speed P1D),mean(wind_speed P1D)'
+        else:
+            elements = 'max(air_temperature P1D),min(air_temperature P1D),mean(air_temperature P1D)'
         parameters = {
             'sources': location,
-            'elements': 'max(air_temperature P1D),min(air_temperature P1D),mean(air_temperature P1D)',
+            'elements': elements,
             'referencetime': get_date,
             'timeoffsets': 'default',
             'levels': 'default',
@@ -132,7 +137,11 @@ for days_back in range(0, int(config['num_days'])):
 plt.axhline(y=0, color='b', linestyle='-')
 
 # Create Chart title
-title_string = 'Temperature in {} on '.format(location_name.capitalize())
+if config['wind']:
+    weather_type = 'Wind speed'
+else:
+    weather_type = 'Temperature'
+title_string = '{} in {} on '.format(weather_type, location_name.capitalize())
 if int(config['num_days']) > 1:
     start_date = requested_date - datetime.timedelta(days=(int(config['num_days']) - 1))
     title_string = title_string + ('{}/{} to '.format(start_date.day, start_date.month))
@@ -142,7 +151,11 @@ plt.title(title_string, size='x-large')
 # Add legends
 plt.subplots_adjust(bottom=0.2)
 plt.legend(handles=[max_plot, mean_plot, min_plot], bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=3)
-plt.ylabel("Recorded temperatures ('C)")
+
+if config['wind']:
+    plt.ylabel("Recorded wind speed (m/s)")
+else:
+    plt.ylabel("Recorded temperatures ('C)")
 
 # Show graph
 plt.plot()
