@@ -13,6 +13,7 @@ sources = {
     'bergen': 'SN50540',
     'tromsø': 'SN90450',
     'oppdal': 'SN63705',
+    'skistua': 'SN68110',
 }
 
 parser = argparse.ArgumentParser(description="Weather data for Trondheim",
