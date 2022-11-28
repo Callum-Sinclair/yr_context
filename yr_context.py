@@ -25,6 +25,7 @@ parser.add_argument("-i", "--location_id", default=0, help="Weather station ID t
 parser.add_argument("-n", "--num_days", default=1, help="The number of days to fetch for each year (requested day and (n-1) days previous)")
 parser.add_argument("-a", "--average_only", action='store_true', help="Only display the average temperatures, not max and min")
 parser.add_argument("-w", "--wind", action='store_true', help="Get wind speed (max gust, daily average, minimum hourly average) instead of temperature")
+parser.add_argument("-W", "--weather", default=0, help="Weather type to fetch instead of temperature (see frost.met.no/elementtable)")
 parser.add_argument("-q", "--quiet", action='store_true', help="Silence most print output")
 
 args = parser.parse_args()
@@ -79,7 +80,10 @@ for days_back in range(0, int(config['num_days'])):
 
         # Define endpoint and parameters
         endpoint = 'https://frost.met.no/observations/v0.jsonld'
-        if config['wind']:
+
+        if config['weather']:
+            elements = 'max({0} P1D),min({0} P1D),mean({0} P1D)'.format(config['weather'])
+        elif config['wind']:
             elements = 'max(wind_speed_of_gust P1D),min(wind_speed P1D),mean(wind_speed P1D)'
         else:
             elements = 'max(air_temperature P1D),min(air_temperature P1D),mean(air_temperature P1D)'
@@ -138,7 +142,9 @@ for days_back in range(0, int(config['num_days'])):
 plt.axhline(y=0, color='b', linestyle='-')
 
 # Create Chart title
-if config['wind']:
+if config['weather']:
+    weather_type = config['weather']
+elif config['wind']:
     weather_type = 'Wind speed'
 else:
     weather_type = 'Temperature'
@@ -153,7 +159,9 @@ plt.title(title_string, size='x-large')
 plt.subplots_adjust(bottom=0.2)
 plt.legend(handles=[max_plot, mean_plot, min_plot], bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=3)
 
-if config['wind']:
+if config['weather']:
+    plt.ylabel("Recorded {}".format(config['weather']))
+elif config['wind']:
     plt.ylabel("Recorded wind speed (m/s)")
 else:
     plt.ylabel("Recorded temperatures ('C)")
